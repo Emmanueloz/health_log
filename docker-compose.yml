@@ -1,0 +1,95 @@
+services:
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://auth_user:auth_password@auth-db:5432/auth_db
+      - SECRET_KEY=your-secret-key-here
+    depends_on:
+      - auth-db
+    networks:
+      - microservices-network
+
+  # Business Service
+  business-service:
+    build: ./business-service
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://business_user:business_password@business-db:5432/business_db
+      - AUTH_SERVICE_URL=http://auth-service:5000
+      - NOTIFICATION_SERVICE_URL=http://notification-service:5000
+    depends_on:
+      - business-db
+      - auth-service
+    networks:
+      - microservices-network
+
+  # Notification Service
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "5002:5000"
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://notification_user:notification_password@notification-db:5432/notification_db
+      - SMTP_SERVER=smtp.example.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=your-email@example.com
+      - SMTP_PASSWORD=your-email-password
+    depends_on:
+      - notification-db
+    networks:
+      - microservices-network
+
+  # Auth Database
+  auth-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=auth_user
+      - POSTGRES_PASSWORD=auth_password
+      - POSTGRES_DB=auth_db
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # Business Database
+  business-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=business_user
+      - POSTGRES_PASSWORD=business_password
+      - POSTGRES_DB=business_db
+    volumes:
+      - business-db-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  # Notification Database
+  notification-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=notification_user
+      - POSTGRES_PASSWORD=notification_password
+      - POSTGRES_DB=notification_db
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+  business-db-data:
+  notification-db-data:
