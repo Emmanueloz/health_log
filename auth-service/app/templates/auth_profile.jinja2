@@ -1,0 +1,14 @@
+{% extends "base.jinja2" %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+<h1>Perfil</h1>
+{% if user %}
+  <p><strong>ID:</strong> {{ user.id }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <form method="post" action="{{ url_for('views.logout_view') }}">
+    <button type="submit">Logout</button>
+  </form>
+{% else %}
+  <p>No autenticado.</p>
+{% endif %}
+{% endblock %}

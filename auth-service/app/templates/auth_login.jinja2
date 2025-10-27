@@ -1,0 +1,18 @@
+{% extends "base.jinja2" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h1>Login</h1>
+<form method="post" action="{{ url_for('views.login_view') }}">
+  <label>Email
+    <input type="email" name="email" required />
+  </label>
+  <label>Contraseña
+    <input type="password" name="password" required minlength="8" />
+  </label>
+  <button type="submit">Entrar</button>
+</form>
+<p>
+  ¿No tienes cuenta? <a href="{{ url_for('views.register_view') }}">Regístrate</a>
+  · <a href="{{ url_for('views.forgot_password_view') }}">Olvidé mi contraseña</a>
+</p>
+{% endblock %}
